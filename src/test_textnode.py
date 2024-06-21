@@ -1,7 +1,7 @@
 import unittest
 
-from textnode import TextNode
-
+from textnode import TextNode, text_node_to_html
+from htmlnode import LeafNode
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -60,6 +60,51 @@ class TestTextNode(unittest.TestCase):
         node_other.text_type = "italic"
         
         self.assertNotEqual(node, node_other)
+
+
+
+    # tests below are for the text_node_to_html conversions
+    def test_conversion_to_leafnode_text(self):
+        text_node = TextNode('Hello', 'text')
+        html_node = text_node_to_html(text_node)
+        assert html_node.tag is None
+        assert html_node.value == 'Hello'
+        assert html_node.props is None
+
+    def test_conversion_to_leafnode_bold(self):
+        text_node = TextNode('Hello', 'bold')
+        html_node = text_node_to_html(text_node)
+        assert html_node.tag == 'b'
+        assert html_node.value == 'Hello'
+        assert html_node.props is None
+
+    def test_conversion_to_leafnode_italic(self):
+        text_node = TextNode('Hello', 'italic')
+        html_node = text_node_to_html(text_node)
+        assert html_node.tag == 'i'
+        assert html_node.value == 'Hello'
+        assert html_node.props is None
+
+    def test_conversion_to_leafnode_code(self):
+        text_node = TextNode('This is code', 'code')
+        html_node = text_node_to_html(text_node)
+        assert html_node.tag == 'code'
+        assert html_node.value == 'This is code'
+        assert html_node.props is None
+
+    def test_conversion_to_leafnode_link(self):
+        text_node = TextNode('Click Here', 'link', 'www.google.com')
+        html_node = text_node_to_html(text_node)
+        assert html_node.tag == 'a'
+        assert html_node.value == 'Click Here'
+        assert html_node.props == {'href': 'www.google.com'}
+
+    def test_conversion_to_leafnode_image(self):
+        text_node = TextNode('This is an image', 'image', 'www.google.com/image.png')
+        html_node = text_node_to_html(text_node)
+        assert html_node.tag == 'img'
+        assert html_node.value == ''
+        assert html_node.props == {'src': 'www.google.com/image.png', 'alt': 'This is an image'}
 
 if __name__ == "__main__":
     unittest.main()
